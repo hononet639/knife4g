@@ -3,7 +3,7 @@ package knife4g
 import (
 	"embed"
 	"github.com/gin-gonic/gin"
-	myTemplate "knife4g/template"
+	myTemplate "github.com/hononet639/knife4g/template"
 	"log"
 	"net/http"
 	"os"
