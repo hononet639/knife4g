@@ -1,0 +1,8 @@
+[
+    {
+        "name": "knife4g",
+        "url": "/swagger",
+        "swaggerVersion": "2.0",
+        "location": "/swagger"
+    }
+]
