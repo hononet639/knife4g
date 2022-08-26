@@ -20,7 +20,6 @@ var (
 
 type Config struct {
 	RelativePath string
-	Port         string
 }
 
 type service struct {
@@ -42,11 +41,11 @@ func Handler(config Config) gin.HandlerFunc {
 	myTemplate.RelativePath = config.RelativePath
 	docJsonPath := config.RelativePath + "/docJson"
 	servicesPath := config.RelativePath + "/front/service"
-	docPath := config.RelativePath + "/front/index"
+	docPath := config.RelativePath + "/index"
 	app9f2e4e4ePath := config.RelativePath + "/front/webjars/js/app.9f299301.js"
 
-	s.Url = "http://127.0.0.1:" + config.Port + config.RelativePath + "/docJson"
-	s.Location = "http://127.0.0.1:" + config.Port + config.RelativePath + "/docJson"
+	s.Url = "/docJson"
+	s.Location = "/docJson"
 	s.Name = "API Documentation"
 	s.SwaggerVersion = "2.0"
 	return func(ctx *gin.Context) {
