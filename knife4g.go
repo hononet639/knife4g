@@ -63,11 +63,14 @@ func Handler(config Config) gin.HandlerFunc {
 			if err != nil {
 				log.Println(err)
 			}
-			_ = tp.Execute(ctx.Writer, config)
+			err = tp.Execute(ctx.Writer, config)
+			if err != nil {
+				log.Println(err)
+			}
 		case docJsonPath:
 			ctx.Data(http.StatusOK, "application/json; charset=utf-8", docJson)
 		default:
-			ctx.FileFromFS(strings.TrimLeft(ctx.Request.RequestURI, config.RelativePath), http.FS(Front))
+			ctx.FileFromFS(strings.TrimPrefix(ctx.Request.RequestURI, config.RelativePath), http.FS(Front))
 		}
 
 	}
