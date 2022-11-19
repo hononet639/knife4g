@@ -3,7 +3,6 @@ package knife4g
 import (
 	"embed"
 	"github.com/gin-gonic/gin"
-	myTemplate "github.com/hononet639/knife4g/template"
 	"log"
 	"net/http"
 	"os"
@@ -13,7 +12,7 @@ import (
 
 var (
 	//go:embed front
-	Front   embed.FS
+	front   embed.FS
 	docJson []byte
 	s       service
 )
@@ -38,39 +37,51 @@ func init() {
 }
 
 func Handler(config Config) gin.HandlerFunc {
-	myTemplate.RelativePath = config.RelativePath
 	docJsonPath := config.RelativePath + "/docJson"
 	servicesPath := config.RelativePath + "/front/service"
 	docPath := config.RelativePath + "/index"
-	app9f2e4e4ePath := config.RelativePath + "/front/webjars/js/app.9f299301.js"
+	appjsPath := config.RelativePath + "/front/webjars/js/app.42aa019b.js"
 
 	s.Url = "/docJson"
 	s.Location = "/docJson"
 	s.Name = "API Documentation"
 	s.SwaggerVersion = "2.0"
+
+	appjsTemplate, err := template.New("app.42aa019b.js").
+		Delims("{[(", ")]}").
+		ParseFS(front, "front/webjars/js/app.42aa019b.js")
+	if err != nil {
+		log.Println(err)
+	}
+	docTemplate, err := template.New("doc.html").
+		Delims("{[(", ")]}").
+		ParseFS(front, "front/doc.html")
+	if err != nil {
+		log.Println(err)
+	}
+
 	return func(ctx *gin.Context) {
 		if ctx.Request.Method != http.MethodGet {
 			ctx.AbortWithStatus(http.StatusMethodNotAllowed)
 			return
 		}
 		switch ctx.Request.RequestURI {
-		case app9f2e4e4ePath:
-			ctx.Data(200, "text/javascript", []byte(myTemplate.GetApp9f299301(config.RelativePath)))
-		case servicesPath:
-			ctx.JSON(http.StatusOK, []service{s})
-		case docPath:
-			tp, err := template.New("doc").Parse(myTemplate.Doc)
+		case appjsPath:
+			err := appjsTemplate.Execute(ctx.Writer, config)
 			if err != nil {
 				log.Println(err)
 			}
-			err = tp.Execute(ctx.Writer, config)
+		case servicesPath:
+			ctx.JSON(http.StatusOK, []service{s})
+		case docPath:
+			err := docTemplate.Execute(ctx.Writer, config)
 			if err != nil {
 				log.Println(err)
 			}
 		case docJsonPath:
 			ctx.Data(http.StatusOK, "application/json; charset=utf-8", docJson)
 		default:
-			ctx.FileFromFS(strings.TrimPrefix(ctx.Request.RequestURI, config.RelativePath), http.FS(Front))
+			ctx.FileFromFS(strings.TrimPrefix(ctx.Request.RequestURI, config.RelativePath), http.FS(front))
 		}
 
 	}
